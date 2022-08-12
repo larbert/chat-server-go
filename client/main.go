@@ -3,12 +3,16 @@ package main
 import (
 	"chat-server/src/message"
 	"encoding/gob"
+	"fmt"
 	"log"
 	"net"
 )
 
 func main() {
-	conn, err := net.Dial("tcp", ":6760")
+	var tcpAddr string
+	fmt.Printf("输入TCP目的地: ")
+	fmt.Scanf("%s", &tcpAddr)
+	conn, err := net.Dial("tcp", tcpAddr)
 	if err != nil {
 		log.Println("connect error: ", err)
 	}
@@ -47,6 +51,7 @@ func handleWrite(conn net.Conn, readChan chan bool, writeChan chan bool) {
 	}
 	close(writeChan)
 }
+
 func handleRead(conn net.Conn, readChan chan bool, writeChan chan bool, exitChan chan bool) {
 	m := &message.ChatMessage{}
 	for {
@@ -66,26 +71,3 @@ func handleRead(conn net.Conn, readChan chan bool, writeChan chan bool, exitChan
 	close(readChan)
 	close(exitChan)
 }
-
-//go func(readChan chan bool, writeChan chan bool) {
-//	for i := 0; i < 10; i++ {
-//		log.Println("send", i)
-//		writeChan <- true
-//		<-readChan
-//	}
-//	close(writeChan)
-//}(readChan, writeChan)
-//
-//go func(readChan chan bool, writeChan chan bool, exitChan chan bool) {
-//	for {
-//		v, ok := <-writeChan
-//		if v && ok {
-//			readChan <- true
-//		} else {
-//			break
-//		}
-//	}
-//	exitChan <- true
-//	close(readChan)
-//	close(exitChan)
-//}(readChan, writeChan, exitChan)
