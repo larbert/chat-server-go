@@ -1,7 +1,7 @@
 package message
 
 const (
-	Erro    byte = 0
+	Error   byte = 0
 	ACK     byte = 1
 	Join    byte = 2
 	Search  byte = 3
