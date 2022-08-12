@@ -52,6 +52,9 @@ func handleTcp(conn *net.TCPConn) {
 			if _, ok := err.(*net.OpError); ok {
 				log.Println("connect useless")
 				break
+			} else if err.Error() == "EOF" {
+				log.Println("connect finish")
+				break
 			} else {
 				log.Println("decode error: ", err)
 			}
