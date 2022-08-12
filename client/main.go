@@ -1,20 +1,25 @@
 package main
 
 import (
+	"bufio"
 	"chat-server/src/message"
 	"encoding/gob"
 	"fmt"
 	"log"
 	"net"
+	"os"
+	"strings"
 )
 
 func main() {
-	var tcpAddr string
+	input := bufio.NewReader(os.Stdin)
 	fmt.Printf("输入TCP目的地: ")
-	fmt.Scanf("%s", &tcpAddr)
+	tcpAddr, _ := input.ReadString('\n')
+	tcpAddr = strings.TrimSpace(tcpAddr)
 	conn, err := net.Dial("tcp", tcpAddr)
 	if err != nil {
 		log.Println("connect error: ", err)
+		return
 	}
 	defer func(conn net.Conn) {
 		err := conn.Close()
@@ -37,9 +42,16 @@ func main() {
 
 func handleWrite(conn net.Conn, readChan chan bool, writeChan chan bool) {
 	m := &message.ChatMessage{}
-	for i := 0; i < 10; i++ {
+	input := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Print("> ")
+		messageString, _ := input.ReadString('\n')
+		messageString = strings.TrimSpace(messageString)
+		if messageString == "bye" {
+			break
+		}
 		m.Option = message.Quit
-		m.Payload = i
+		m.Payload = messageString
 		enc := gob.NewEncoder(conn)
 		err := enc.Encode(m)
 		if err != nil {
